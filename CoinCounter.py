@@ -1,36 +1,58 @@
-bag_checked = 0 #counter for how many bags each volunteer has counted
-errors = 0 #error counter to calculate each volunteers accuracy
+coins_info = {
+    0.01: [1, 3.56],
+    0.02: [1, 7.12],
+    0.05: [5, 2.35],
+    0.10: [5, 6.50],
+    0.20: [10, 5.00],
+    0.50: [10, 8.00],
+    1.00: [20, 8.75],
+    2.00: [20, 12.00]
+}
 
-def coin_types():
-    coin_list= {
-        "1p":[3.56, 1.00], #first collumn is the coin type
-        "2p":[7.12, 1.00], #second collumn is the coin  weight
-        "5p":[2.35, 5.00], #third collumn is the correct bag weight
-        "10p":[6.40, 5.00],
-        "20p":[5.00, 10.00],
-        "50p":[8.00, 10.00],
-        "£1":[8.75, 20.00],
-        "£2":[12.00, 20.00]
-    } #all coin weights are in grams
-      #all bag weights are in £
+errors = 0
+correct_bags = 0
 
+# coin_type: [bag_value, coin_weight]
 
-def userinputs():
-    volunteer_name = input ("Input your name: ")
-    user_coin_type = input("Input coin type (eg. 5p or £1): ")
-    user_bag_weight = float(input("Input the weight of the bag: "))
-    return volunteer_name, user_coin_type, user_bag_weight
+for key, value in coins_info.items():
+    coin_type = key
+    coin_info = value
+    bag_value = value[0]
+    coin_weight = value[1]
 
+    # number_of_coins = bag_value / coin_type
+    bag_weight = (bag_value / coin_type) * coin_weight
+    coin_info.append(bag_weight)
 
-def calculations():
-    global bag_checked
-    global errors #allows for the variables to be updated not just in the def calculations()
+#coin_type: [bag_value, coin_weight]
 
-    volunteer_name, user_coin_type, user_bag_weight = userinputs() # pulls out the user inputs from the previous def statement
+#Checks that the user inputs the correct coin type
+while True:
+    try:
+        coin_type_input = float(input("Input coin type (eg. 0.5 for pence or 1 for pounds): "))
+    except ValueError:
+        print("Invalid input please try again!")
+        continue
 
-    while True: #checkes if the coin type inputted is a valid option
-        if user_coin_type in coin_types:
-            break
+    if coin_type_input not in coins_info:
         print("Coin type: INVALID")
-        print("Please try again")
-    print("Coin type: VALID")
+        continue
+    else:
+        print("Coin type: VALID")
+
+    # uses the user input to get the correct information for the coin type e.g 0.01: dictionary[]
+    correct_coin_info = coins_info[coin_type_input]
+
+    coin_weight = correct_coin_info[2]
+    break
+
+while True:
+    try:
+        bag_weight_input = float(input("Input bag weight: "))
+    except ValueError:
+        print("Please input a valid number")
+        continue
+    excess = (bag_weight_input - bag_weight) / coin_weight
+    print(f"You should remove {round(excess)} coins (approx)")
+    correct_bags += 1
+    print(correct_bags)
