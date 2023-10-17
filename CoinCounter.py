@@ -1,3 +1,4 @@
+import json
 coins_info = {
     0.01: [1, 3.56],# first collum is the coin type
     0.02: [1, 7.12],# second collum is the bag value
