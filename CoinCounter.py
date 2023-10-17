@@ -9,12 +9,12 @@ coins_info = {
     2.00: [20, 12.00]
 }
 
+#variables that are used to calculate the volunteers accuracy and total bags counted aswell as the total bag value
 errors = 0
 correct_bags = 0
 bags_checked = 0
 total_bag_value = 0
 
-# coin_type: [bag_value, coin_weight]
 
 for key, value in coins_info.items():
     coin_type = key
@@ -22,11 +22,8 @@ for key, value in coins_info.items():
     bag_value = value[0]
     coin_weight = value[1]
 
-    # number_of_coins = bag_value / coin_type
     bag_weight = (bag_value / coin_type) * coin_weight
     coin_info.append(bag_weight)
-
-#coin_type: [bag_value, coin_weight]
 
 
 volunteer_name = input("Input Volunteer name: ").lower()
@@ -63,7 +60,6 @@ while True:
         bags_checked += 1
         total_bag_value += (extra + bag_value)
         total_bag_value = round(total_bag_value,2)
-        print(total_bag_value)
         break
 
     elif bag_weight_input < bag_weight:
@@ -73,7 +69,6 @@ while True:
         bags_checked += 1
         total_bag_value += (bag_value - not_enough)
         total_bag_value = round(total_bag_value,2)
-        print(total_bag_value)
         break
 
     else:
@@ -103,3 +98,16 @@ while True:
         exit()
     else:
         print("You need to input '1' or '2' to get your desired output")
+
+
+#calculates the volunteers accuracy
+accuracy = (errors/ bags_checked) * 100
+
+
+txt_file_info = {
+    volunteer_name : [user_coin_type, bag_weight_input, accuracy],
+}
+print(txt_file_info)
+
+with open("Coin_Count_data.txt", "a") as file:
+    json.dump(txt_file_info, file)
