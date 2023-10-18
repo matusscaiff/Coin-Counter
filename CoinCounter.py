@@ -1,4 +1,25 @@
-import json
+file_path = "Coin_Count.txt"
+
+try:
+    with open(file_path, "r") as f:
+        file_contents = f.read()
+
+        lines = file_contents.split('\n')
+
+        for line in lines:
+            data = line.split()
+            
+            if len(data) == 4:
+                volunteer_name, user_coin_type, bag_weight_input, accuracy = data
+                volunteer_name = volunteer_name.strip()
+                user_coin_type = float(user_coin_type)
+                bag_weight_input = float(bag_weight_input)
+                accuracy = float(accuracy.rstrip('%'))
+            print(data)
+except FileNotFoundError:
+    print(f"File '{file_path}' not found. Starting with empty data.")
+
+
 coins_info = {
     0.01: [1, 3.56],# first collum is the coin type
     0.02: [1, 7.12],# second collum is the bag value
@@ -19,15 +40,16 @@ total_bag_value = 0
 
 for key, value in coins_info.items():
     coin_type = key
-    coin_info = value
     bag_value = value[0]
     coin_weight = value[1]
 
     bag_weight = (bag_value / coin_type) * coin_weight
-    coin_info.append(bag_weight)
+    value.append(bag_weight)
 
 
+file_path = "Coin_Count.txt"
 volunteer_name = input("Input Volunteer name: ").lower()
+
 
 #Checks that the user inputs the correct coin type
 while True:
@@ -45,6 +67,7 @@ while True:
 
     bag_weight = (coins_info[user_coin_type][0] / user_coin_type) * coins_info[user_coin_type][1]
     break
+
 
 #Checks how many coins the user needs to take out and what their total is
 while True:
@@ -79,6 +102,7 @@ while True:
         total_bag_value += bag_value
         break
 
+#allows the user to choose weather they would like to see the number of bags checked or their total value
 while True:
     try:
         user_option = int(input("Enter '1' if you would like to see the number of bags checked and '2' if you would like to see the total value or '3' to exit the program: "))
@@ -102,13 +126,26 @@ while True:
 
 
 #calculates the volunteers accuracy
-accuracy = (errors/ bags_checked) * 100
+accuracy = (errors/bags_checked) *100
 
 
-txt_file_info = {
-    volunteer_name : [user_coin_type, bag_weight_input, accuracy],
-}
-print(txt_file_info)
+table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
 
-with open("Coin_Count_data.txt", "a") as file:
-    json.dump(txt_file_info, file)
+
+#checks if the name is already in the txt file
+name_found = False
+with open(file_path, "r") as f:
+    for line in f:
+        if volunteer_name in line:
+            name_found = True
+            break
+
+if name_found:
+    print(f"Volunteer '{volunteer_name}' is already in the file.")
+    
+    
+#formats the data into the text file
+template = "{:<15} {:<15} {:<15} {:<15} {:15} \n"
+with open("Coin_Count.txt", "a") as f:
+    f.write(template.format("Volunteer", "Coin Type", "Total Value","Bags Counted", "Accuracy"))
+    f.write(template.format(volunteer_name, user_coin_type, total_bag_value, bags_checked , f"{accuracy:.1f}%"))
