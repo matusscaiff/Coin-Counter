@@ -134,18 +134,41 @@ table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
 
 #checks if the name is already in the txt file
 name_found = False
+data_lines = []  # To store the data lines, including the one for the specific volunteer
+
 with open(file_path, "r") as f:
     for line in f:
         if volunteer_name in line:
             name_found = True
-            break
+            # Store the line for the specific volunteer
+            data_lines.append(line.strip())
+        else:
+            data_lines.append(line.strip())
 
 if name_found:
-    print(f"Volunteer '{volunteer_name}' is already in the file.")
-    
-    
-#formats the data into the text file
-template = "{:<15} {:<15} {:<15} {:<15} {:15} \n"
-with open("Coin_Count.txt", "a") as f:
-    f.write(template.format("Volunteer", "Coin Type", "Total Value","Bags Counted", "Accuracy"))
-    f.write(template.format(volunteer_name, user_coin_type, total_bag_value, bags_checked , f"{accuracy:.1f}%"))
+    # Modify the data for the specific volunteer if their name exists
+    updated_data_lines = []
+    total_bag_value_existing = 0
+    bags_checked_existing = 0
+    correct_bags_existing = 0
+
+    for line in data_lines:
+        if volunteer_name in line:
+            # Modify the line for the specific volunteer with updated data
+            existing_data = line.split()
+            total_bag_value_existing = float(existing_data[2])
+            bags_checked_existing = int(existing_data[3])
+
+            updated_data = f"{volunteer_name} {user_coin_type} {total_bag_value_existing + total_bag_value} {bags_checked_existing + bags_checked} {accuracy:.1f}%"
+            updated_data_lines.append(updated_data)
+        else:
+            updated_data_lines.append(line)
+
+    # Open the file in write mode and write the updated data back
+    with open(file_path, "w") as f:
+        for line in updated_data_lines:
+            f.write(f"{line}\n")
+else:
+    # Append the data for a new volunteer
+    with open(file_path, "a") as f:
+        f.write(f"{volunteer_name} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%\n")
