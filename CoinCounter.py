@@ -20,7 +20,7 @@ try:
 except FileNotFoundError:
     print(f"File '{file_path}' not found. Starting with empty data.")
 
-
+#data for the coins and bags
 coins_info = {
     0.01: [1, 3.56],# first collum is the coin type
     0.02: [1, 7.12],# second collum is the bag value
@@ -38,7 +38,7 @@ correct_bags = 0
 bags_checked = 0
 total_bag_value = 0
 
-
+#asigns variables to each value in the dictionary
 for key, value in coins_info.items():
     coin_type = key
     bag_value = value[0]
@@ -50,9 +50,9 @@ for key, value in coins_info.items():
 
 volunteer_name_input = input("Input Volunteer name: ").lower()
 
-# Check if the user's name is already in the text file
+
 name_exists = False
-user_coin_type = None  # Initialize user_coin_type
+user_coin_type = None
 
 for line in lines:
     data = line.split()
@@ -79,7 +79,7 @@ if not name_exists or user_coin_type not in coins_info:
             print("Coin type: VALID")
             break
 
-# Calculate bag_weight based on the validated user's coin type
+# Calculate bag_weight based on the user input
 bag_weight = (coins_info[user_coin_type][0] / user_coin_type) * coins_info[user_coin_type][1]
 
 #Checks how many coins the user needs to take out and what their total is
@@ -117,7 +117,7 @@ while True:
 
 
 #calculates the volunteers accuracy
-accuracy = (errors/bags_checked) *100
+accuracy = (errors / (bags_checked + correct_bags)) * 100
 
 
 table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
@@ -132,18 +132,18 @@ with open(file_path, "r") as f:
     for line in f:
         volunteer_name, user_coin_type_str, total_bag_value_str, bags_checked_str, accuracy_str = line.split()
         user_coin_type_existing = float(user_coin_type_str)
-        
+
         if volunteer_name == volunteer_name_input and user_coin_type_existing == user_coin_type:
             name_coin_type_found = True
             total_bag_value_existing = float(total_bag_value_str)
             bags_checked_existing = int(bags_checked_str)
             accuracy_existing = float(accuracy_str.rstrip('%'))
-            
+
             total_bag_value += total_bag_value_existing
             bags_checked += bags_checked_existing
             accuracy = (bags_checked / (bags_checked + bags_checked_existing)) * accuracy + (bags_checked_existing / (bags_checked + bags_checked_existing)) * accuracy_existing
 
-            updated_data = f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked + bags_checked_existing} {accuracy:.1f}%"
+            updated_data = f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%"
             data_lines.append(updated_data)
         else:
             data_lines.append(line.strip())
@@ -158,7 +158,6 @@ if name_coin_type_found:
 if not name_coin_type_found:
     with open(file_path, "a") as f:
         f.write(f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%\n")
-
 
 #allows the user to choose weather they would like to see the number of bags checked or their total value
 while True:
