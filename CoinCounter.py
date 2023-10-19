@@ -1,6 +1,6 @@
 file_path = "Coin_Count.txt"
 
-#reads out the txt file and creates variabes for all the data in the txt file
+# Reads the txt file and creates variables for all the data in the txt file
 try:
     with open(file_path, "r") as f:
         file_contents = f.read()
@@ -9,7 +9,7 @@ try:
 
         for line in lines:
             data = line.split()
-            
+
             if len(data) == 4:
                 volunteer_name, user_coin_type, bag_weight_input, accuracy = data
                 volunteer_name = volunteer_name.strip()
@@ -20,11 +20,11 @@ try:
 except FileNotFoundError:
     print(f"File '{file_path}' not found. Starting with empty data.")
 
-#data for the coins and bags
+# Data for the coins and bags
 coins_info = {
-    0.01: [1, 3.56],# first collum is the coin type
-    0.02: [1, 7.12],# second collum is the bag value
-    0.05: [5, 2.35],# third collum is the coin weight
+    0.01: [1, 3.56],  # first column is the coin type
+    0.02: [1, 7.12],  # second column is the bag value
+    0.05: [5, 2.35],  # third column is the coin weight
     0.10: [5, 6.50],
     0.20: [10, 5.00],
     0.50: [10, 8.00],
@@ -32,13 +32,13 @@ coins_info = {
     2.00: [20, 12.00]
 }
 
-#variables that are used to calculate the volunteers accuracy and total bags counted aswell as the total bag value
+# Variables that are used to calculate the volunteer's accuracy and total bags counted as well as the total bag value
 errors = 0
 correct_bags = 0
 bags_checked = 0
 total_bag_value = 0
 
-#asigns variables to each value in the dictionary
+# Assigns variables to each value in the dictionary
 for key, value in coins_info.items():
     coin_type = key
     bag_value = value[0]
@@ -47,9 +47,7 @@ for key, value in coins_info.items():
     bag_weight = (bag_value / coin_type) * coin_weight
     value.append(bag_weight)
 
-
 volunteer_name_input = input("Input Volunteer name: ").lower()
-
 
 name_exists = False
 user_coin_type = None
@@ -82,48 +80,51 @@ if not name_exists or user_coin_type not in coins_info:
 # Calculate bag_weight based on the user input
 bag_weight = (coins_info[user_coin_type][0] / user_coin_type) * coins_info[user_coin_type][1]
 
-#Checks how many coins the user needs to take out and what their total is
+# Reset bags_checked, errors, and correct_bags at the beginning of each run
+bags_checked = 0
+errors = 0
+correct_bags = 0
+
+# Checks how many coins the user needs to take out and what their total is
 while True:
     try:
-        bag_weight_input = float(input("Input bag weight in gramms: "))
+        bag_weight_input = float(input("Input bag weight in grams: "))
     except ValueError:
         print("Please input a valid number")
         continue
 
     if bag_weight_input > bag_weight:
         extra = (bag_weight_input - bag_weight) / coin_weight
-        print(f"You should remove {round(extra)} coins (approx)") #the letter f formats the variable extra and rounds it to the nearest intager
+        print(f"You should remove {round(extra)} coins (approx)")
         errors += 1
         bags_checked += 1
         total_bag_value += (extra + bag_value)
-        total_bag_value = round(total_bag_value,2)
+        total_bag_value = round(total_bag_value, 2)
         break
 
     elif bag_weight_input < bag_weight:
-        not_enough = (bag_weight- bag_weight_input) / coin_weight
+        not_enough = (bag_weight - bag_weight_input) / coin_weight
         print(f"You should add {round(not_enough)} coins")
         errors += 1
         bags_checked += 1
         total_bag_value += (bag_value - not_enough)
-        total_bag_value = round(total_bag_value,2)
+        total_bag_value = round(total_bag_value, 2)
         break
 
     else:
-        print("You have entered the correct ammount of coins into the bag")
+        print("You have entered the correct amount of coins into the bag")
         correct_bags += 1
         bags_checked += 1
         total_bag_value += bag_value
+        total_bag_value = round(total_bag_value, 2)
         break
 
-
-#calculates the volunteers accuracy
-accuracy = (errors / (bags_checked + correct_bags)) * 100
-
+# Calculate accuracy based on the current run
+accuracy = (correct_bags / bags_checked) * 100
 
 table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
 
-
-#checks if the name is already in the txt file
+# Check if the name is already in the txt file
 # Check if the name and coin type combination exists
 name_coin_type_found = False
 data_lines = []
@@ -141,7 +142,8 @@ with open(file_path, "r") as f:
 
             total_bag_value += total_bag_value_existing
             bags_checked += bags_checked_existing
-            accuracy = (bags_checked / (bags_checked + bags_checked_existing)) * accuracy + (bags_checked_existing / (bags_checked + bags_checked_existing)) * accuracy_existing
+            accuracy = (correct_bags / bags_checked) * 100  # Update accuracy
+            accuracy += (bags_checked_existing / bags_checked) * accuracy_existing
 
             updated_data = f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%"
             data_lines.append(updated_data)
@@ -159,7 +161,7 @@ if not name_coin_type_found:
     with open(file_path, "a") as f:
         f.write(f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%\n")
 
-#allows the user to choose weather they would like to see the number of bags checked or their total value
+# Allows the user to choose whether they would like to see the number of bags checked or their total value
 while True:
     try:
         user_option = int(input("Enter '1' if you would like to see the number of bags checked and '2' if you would like to see the total value or '3' to exit the program: "))
@@ -168,11 +170,11 @@ while True:
         continue
 
     if user_option == 1:
-        print("Bags checked:",bags_checked)
+        print("Bags checked:", bags_checked)
         break
 
     elif user_option == 2:
-        print("Total bag value:",total_bag_value)
+        print("Total bag value:", total_bag_value)
         break
 
     elif user_option == 3:
