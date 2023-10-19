@@ -1,5 +1,6 @@
 file_path = "Coin_Count.txt"
 
+#reads out the txt file and creates variabes for all the data in the txt file
 try:
     with open(file_path, "r") as f:
         file_contents = f.read()
@@ -47,27 +48,39 @@ for key, value in coins_info.items():
     value.append(bag_weight)
 
 
-file_path = "Coin_Count.txt"
-volunteer_name = input("Input Volunteer name: ").lower()
+volunteer_name_input = input("Input Volunteer name: ").lower()
 
+# Check if the user's name is already in the text file
+name_exists = False
+user_coin_type = None  # Initialize user_coin_type
 
-#Checks that the user inputs the correct coin type
-while True:
-    try:
-        user_coin_type = float(input("Input coin type (eg. 0.5 for pence or 1 for pounds): "))
-    except ValueError:
-        print("Invalid input please try again!")
-        continue
+for line in lines:
+    data = line.split()
+    if len(data) == 4:
+        name, existing_coin_type_str, bag_weight_input, accuracy_str = data
+        if name == volunteer_name_input:
+            name_exists = True
+            user_coin_type = float(existing_coin_type_str)
+            print(f"Using existing coin type: {user_coin_type}")
+            break
 
-    if user_coin_type not in coins_info:
-        print("Coin type: INVALID")
-        continue
-    else:
-        print("Coin type: VALID")
+# If the name doesn't exist or the existing coin type is invalid, prompt for the coin type
+if not name_exists or user_coin_type not in coins_info:
+    while True:
+        try:
+            user_coin_type = float(input("Input coin type (e.g., 0.5 for pence or 1 for pounds): "))
+        except ValueError:
+            print("Invalid input. Please try again!")
+            continue
 
-    bag_weight = (coins_info[user_coin_type][0] / user_coin_type) * coins_info[user_coin_type][1]
-    break
+        if user_coin_type not in coins_info:
+            print("Coin type: INVALID")
+        else:
+            print("Coin type: VALID")
+            break
 
+# Calculate bag_weight based on the validated user's coin type
+bag_weight = (coins_info[user_coin_type][0] / user_coin_type) * coins_info[user_coin_type][1]
 
 #Checks how many coins the user needs to take out and what their total is
 while True:
@@ -102,6 +115,51 @@ while True:
         total_bag_value += bag_value
         break
 
+
+#calculates the volunteers accuracy
+accuracy = (errors/bags_checked) *100
+
+
+table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
+
+
+#checks if the name is already in the txt file
+# Check if the name and coin type combination exists
+name_coin_type_found = False
+data_lines = []
+
+with open(file_path, "r") as f:
+    for line in f:
+        volunteer_name, user_coin_type_str, total_bag_value_str, bags_checked_str, accuracy_str = line.split()
+        user_coin_type_existing = float(user_coin_type_str)
+        
+        if volunteer_name == volunteer_name_input and user_coin_type_existing == user_coin_type:
+            name_coin_type_found = True
+            total_bag_value_existing = float(total_bag_value_str)
+            bags_checked_existing = int(bags_checked_str)
+            accuracy_existing = float(accuracy_str.rstrip('%'))
+            
+            total_bag_value += total_bag_value_existing
+            bags_checked += bags_checked_existing
+            accuracy = (bags_checked / (bags_checked + bags_checked_existing)) * accuracy + (bags_checked_existing / (bags_checked + bags_checked_existing)) * accuracy_existing
+
+            updated_data = f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked + bags_checked_existing} {accuracy:.1f}%"
+            data_lines.append(updated_data)
+        else:
+            data_lines.append(line.strip())
+
+# If the name and coin type combination was found, update the line
+if name_coin_type_found:
+    with open(file_path, "w") as f:
+        for line in data_lines:
+            f.write(f"{line}\n")
+
+# If not found, append a new line
+if not name_coin_type_found:
+    with open(file_path, "a") as f:
+        f.write(f"{volunteer_name_input} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%\n")
+
+
 #allows the user to choose weather they would like to see the number of bags checked or their total value
 while True:
     try:
@@ -123,52 +181,3 @@ while True:
         exit()
     else:
         print("You need to input '1' or '2' to get your desired output")
-
-
-#calculates the volunteers accuracy
-accuracy = (errors/bags_checked) *100
-
-
-table_data = ["Volunteer name", "Coin Type", "Bag Weight", "Accuracy"]
-
-
-#checks if the name is already in the txt file
-name_found = False
-data_lines = []  # To store the data lines, including the one for the specific volunteer
-
-with open(file_path, "r") as f:
-    for line in f:
-        if volunteer_name in line:
-            name_found = True
-            # Store the line for the specific volunteer
-            data_lines.append(line.strip())
-        else:
-            data_lines.append(line.strip())
-
-if name_found:
-    # Modify the data for the specific volunteer if their name exists
-    updated_data_lines = []
-    total_bag_value_existing = 0
-    bags_checked_existing = 0
-    correct_bags_existing = 0
-
-    for line in data_lines:
-        if volunteer_name in line:
-            # Modify the line for the specific volunteer with updated data
-            existing_data = line.split()
-            total_bag_value_existing = float(existing_data[2])
-            bags_checked_existing = int(existing_data[3])
-
-            updated_data = f"{volunteer_name} {user_coin_type} {total_bag_value_existing + total_bag_value} {bags_checked_existing + bags_checked} {accuracy:.1f}%"
-            updated_data_lines.append(updated_data)
-        else:
-            updated_data_lines.append(line)
-
-    # Open the file in write mode and write the updated data back
-    with open(file_path, "w") as f:
-        for line in updated_data_lines:
-            f.write(f"{line}\n")
-else:
-    # Append the data for a new volunteer
-    with open(file_path, "a") as f:
-        f.write(f"{volunteer_name} {user_coin_type} {total_bag_value} {bags_checked} {accuracy:.1f}%\n")
