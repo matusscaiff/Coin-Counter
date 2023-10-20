@@ -76,10 +76,6 @@ for key, value in coins_info.items():
     bag_value = value[0]
     coin_weight = value[1]
 
-    #calculates the expected bag weight of the coin
-    bag_weight = (bag_value / coin_type) * coin_weight
-    value.append(bag_weight)
-
 
 volunteer_name_input = input("Input Volunteer name: ").lower()
 
@@ -199,7 +195,7 @@ if not name_coin_type_found:
 # Allows the user to choose whether they would like to see the number of bags checked or their total value aswell as all the saved data
 while True:
     try:
-        user_option = int(input("Enter '1' if you would like to see the number of bags checked, '2' to see the total value, '3' to exit the program, or '4' to list data by accuracy: "))
+        user_option = int(input("Enter '1' if you would like to see the number of bags checked, '2' to see the total value, '3' to exit the program, or '4' to list data: "))
     except ValueError:
         print("Please input a valid number")
         continue
