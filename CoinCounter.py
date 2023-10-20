@@ -1,5 +1,14 @@
 file_path = "Coin_Count.txt"
 
+# Attempt to open the file, and create it if it doesn't exist
+try:
+    with open(file_path, "r") as f:
+        file_contents = f.read()
+except FileNotFoundError:
+    # If the file doesn't exist, create it and write a header
+    with open(file_path, "w") as f:
+        pass
+
 while True:
     try:
         start_option = int(input("Enter '1' to begin counting coins or '2' to list existing data: "))
@@ -8,7 +17,7 @@ while True:
         continue
 
     if start_option == 1:
-        #Continues on with the code so that the user can count another bag
+        # Continues on with the code so that the user can count another bag
         break
 
     elif start_option == 2:
@@ -24,11 +33,11 @@ while True:
             # Sort the data by accuracy from highest to lowest
             data_lines.sort(key=lambda x: x[-1], reverse=True)
 
-            print("Volunteer name | Coin Type | Bag Weight | Accuracy")
+            print("Volunteer name | Coin Type | Bag Weight | Accuracy | Total Bag Value")
             for line in data_lines:
-                print(f"{line[0]} | {line[1]} | {line[2]} | {line[4]:.1f}%")
+                print(f"{line[0]} | {line[1]} | {line[2]} | {line[4]:.1f}% | {line[5]}")
 
-        exit()  # Exits the program so that the other code isnt executed
+        exit()  # Exits the program so that the other code isn't executed
     else:
         print("You need to input '1' or '2' to proceed")
 
